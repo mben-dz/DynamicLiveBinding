@@ -1,0 +1,29 @@
+unit Entity.Person;
+
+interface
+
+type
+  TPerson = class
+  private
+    fAge: Integer;
+    fLastName: string;
+    fFirstName: string;
+  public
+    constructor Create(const aFirstName, aLastName: String; aAge: Integer);
+    property FirstName: string read fFirstName write fFirstName;
+    property LastName: string read fLastName write fLastName;
+    property Age: Integer read fAge write fAge;
+  end;
+
+implementation
+
+{ TPerson }
+
+constructor TPerson.Create(const aFirstName, aLastName: String; aAge: Integer);
+begin
+  fFirstName := aFirstName;
+  fLastName  := aLastName;
+  fAge       := aAge;
+end;
+
+end.

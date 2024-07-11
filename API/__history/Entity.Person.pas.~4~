@@ -1,0 +1,54 @@
+unit Entity.Person;
+
+interface
+
+uses
+  System.Classes
+, Vcl.Graphics
+, API.Types
+  ;
+
+type
+  TPerson = class
+  strict private
+    fID: Integer;
+    fFirstname: string;
+    fLastname: string;
+    fAge: Double;
+  private
+
+  public
+    constructor Create(aID: Integer; const aFirstname, aLastname: string;
+      aAge: Double); //; aPicture: TBitmap);
+    destructor Destroy; override;
+
+    [Column_Attribute('ID', 30)]
+    property ID: Integer           read fID        write fID;
+    [Column_Attribute('ID', 100)]
+    property Firstname: string     read fFirstname write fFirstname;
+    [Column_Attribute('ID', 100)]
+    property Lastname: string      read fLastname  write fLastname;
+    [Column_Attribute('ID', 40)]
+    property Age: Double           read fAge       write fAge;
+  end;
+
+implementation
+
+{ TPerson }
+
+{$REGION '  [constructor||destructor] ..'}
+constructor TPerson.Create(aID: Integer; const aFirstname, aLastname: string;
+  aAge: Double); //aPicture: TBitmap);
+begin
+  fID        := aID;
+  fFirstname := aFirstname;
+  fLastname  := aLastname;
+  fAge       := aAge;
+end;
+
+destructor TPerson.Destroy;
+begin inherited;
+end;
+{$ENDREGION}
+
+end.

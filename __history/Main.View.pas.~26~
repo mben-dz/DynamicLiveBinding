@@ -1,0 +1,140 @@
+unit Main.View;
+
+interface
+
+uses
+{$REGION '  Use[Winapi''s] ..'}
+  Winapi.Windows
+, Winapi.Messages
+{$ENDREGION}
+{$REGION '  Use[System''s] ..'}
+, System.SysUtils
+, System.Variants
+, System.Rtti
+, System.Bindings.Outputs
+, System.Classes
+, System.Generics.Collections
+{$ENDREGION}
+{$REGION '  Use[Vcl''s] ..'}
+, Vcl.Graphics
+, Vcl.Controls
+, Vcl.Forms
+, Vcl.Dialogs
+, Vcl.ComCtrls
+, Vcl.StdCtrls
+, Vcl.Bind.DBEngExt
+, Vcl.Bind.Editors
+, Vcl.ExtCtrls
+, Vcl.Buttons
+, Vcl.Bind.Navigator
+{$ENDREGION}
+
+{$REGION '  Use[Data.Bind''s] ..'}
+, Data.Bind.Controls
+, Data.Bind.Components
+, Data.Bind.ObjectScope
+, Data.Bind.EngExt
+{$ENDREGION}
+, Entity.Person
+, API.Generics
+;
+
+type
+  TMainView = class(TForm)
+  {$REGION '  [Components] ..'}
+    LV_Person: TListView;
+    BindNav_Person: TBindNavigator;
+    Btn_Activate: TButton;
+    procedure FormCreate(Sender: TObject);
+    procedure LV_PersonCustomDrawItem(Sender: TCustomListView; Item: TListItem;
+      State: TCustomDrawState; var DefaultDraw: Boolean);
+  {$ENDREGION}
+  private
+    fPersonList: TDynamicObjectList<TPerson>;
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+//var
+//  MainView: TMainView;
+implementation
+
+{$R *.dfm}
+
+procedure TMainView.FormCreate(Sender: TObject);
+begin
+  // A collection that owns the TPerson objects
+  fPersonList := TDynamicObjectList<TPerson>.Create('ID');
+
+  // The individual TPerson objects
+  fPersonList.Add(TPerson.Create(2, 'Gomez', 'Addams', 40));
+  fPersonList.Add(TPerson.Create(4, 'Morticia', 'Addams', 38));
+  fPersonList.Add(TPerson.Create(1, 'Pugsley', 'Addams', 8));
+  fPersonList.Add(TPerson.Create(6, 'Wednesday', 'Addams', 12));
+
+  fPersonList.Add(TPerson.Create(3, 'Uncle', 'Fester', 55));
+  fPersonList.Add(TPerson.Create(5, 'Grandmama', 'Frump', 72));
+  fPersonList.Add(TPerson.Create(9, 'Test', 'Lurch', 50));
+  fPersonList.Add(TPerson.Create(8, 'Thing T.', 'Thing', 99));
+  fPersonList.Add(TPerson.Create(7, 'Cousin', 'Itt', 21));
+  fPersonList.Sort;
+  fPersonList
+    .Bind_List(LV_Person, True)
+    .BindNavigator(BindNav_Person);
+
+end;
+
+procedure TMainView.LV_PersonCustomDrawItem(Sender: TCustomListView;
+  Item: TListItem; State: TCustomDrawState; var DefaultDraw: Boolean);
+const
+  ARROW_MARGIN = 5;
+  ARROW_WIDTH  = 10;
+  ARROW_HEIGHT = 5;
+var
+  L_ArrowPoints: array[0..2] of TPoint;
+  L_ArrowRect: TRect;
+  L_ItemRect: TRect;
+begin
+  // Default item drawing
+  DefaultDraw := True;
+
+  // Get the rectangle of the item
+  L_ItemRect := Item.DisplayRect(drBounds);
+
+  // Set the background color for the selected item
+  if Item.Selected then
+  begin
+    ListView1.Canvas.Brush.Color := clHighlight;
+    ListView1.Canvas.Font.Color := clHighlightText;
+  end
+  else
+  begin
+    ListView1.Canvas.Brush.Color := clWindow;
+    ListView1.Canvas.Font.Color := clWindowText;
+  end;
+
+  // Draw the background and text
+  ListView1.Canvas.FillRect(L_ItemRect);
+  ListView1.Canvas.TextOut(L_ItemRect.Left + 2, L_ItemRect.Top + 2, Item.Caption);
+
+  // Draw the arrow for the selected item
+  if Item.Selected then
+  begin
+    L_ArrowRect := Rect(L_ItemRect.Left - ARROW_WIDTH - ARROW_MARGIN,
+                      L_ItemRect.Top + (L_ItemRect.Height - ARROW_HEIGHT) div 2,
+                      L_ItemRect.Left - ARROW_MARGIN,
+                      L_ItemRect.Top + (L_ItemRect.Height + ARROW_HEIGHT) div 2);
+
+    // Define points for the arrow
+    L_ArrowPoints[0] := Point(L_ArrowRect.Right, L_ArrowRect.Top);
+    L_ArrowPoints[1] := Point(L_ArrowRect.Right, L_ArrowRect.Bottom);
+    L_ArrowPoints[2] := Point(L_ArrowRect.Left, (L_ArrowRect.Top + L_ArrowRect.Bottom) div 2);
+
+    // Draw the arrow
+    ListView1.Canvas.Brush.Color := clBlack;
+    ListView1.Canvas.Polygon(L_ArrowPoints);
+  end;
+end;
+
+end.
